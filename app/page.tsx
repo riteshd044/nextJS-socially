@@ -1,20 +1,29 @@
-import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs"
+import { getPosts } from "@/actions/post.action";
+import { getDbUserId } from "@/actions/user.action";
+import CreatePost from "@/components/CreatePost"
+import PostCard from "@/components/PostCard";
+import WhoToFollow from "@/components/WhoToFollow";
+import { currentUser } from "@clerk/nextjs/server"
 
-const page = () => {
+const page = async() => {
+  const user = await currentUser();
+  const posts = await getPosts();
+  const dbUserId = await getDbUserId();
+  
   return (
-    <div>
-      <Show when="signed-out">
-        <SignInButton mode="modal" />
-        <SignUpButton mode="modal">
-          <button className="bg-[#6c47ff] text-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
-            Sign Up
-          </button>
-        </SignUpButton>
-      </Show>
+    <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
+      <div className="lg:col-span-6 ">
+        {user && <CreatePost/>}
 
-      <Show when="signed-in">
-        <UserButton />
-      </Show>
+        <div className="space-y-6">
+          {posts.map((post) => {
+            return <PostCard key={post.id} post={post} dbUserId={dbUserId} />
+          })}
+        </div>
+      </div>
+      <div className="hidden lg:block lg:col-span-4 sticky top-20 self-start">
+        <WhoToFollow/>
+      </div>
     </div>
   )
 }
