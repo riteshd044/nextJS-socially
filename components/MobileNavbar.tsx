@@ -8,20 +8,31 @@ import {
   UserIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useState } from "react";
-import { useAuth, SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
+import {
+  SignInButton,
+  SignOutButton,
+  useUser,
+} from "@clerk/nextjs";
 import Link from "next/link";
 import ModeToggle from "./ModeToggle";
 
 function MobileNavbar() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  // const { isSignedIn } = useAuth();
   const { user } = useUser();
+
+  const handleClose = () => setShowMobileMenu(false);
 
   return (
     <div className="flex md:hidden items-center space-x-2">
-      <ModeToggle/>
+      <ModeToggle />
 
       <Sheet open={showMobileMenu} onOpenChange={setShowMobileMenu}>
         <SheetTrigger asChild>
@@ -29,13 +40,20 @@ function MobileNavbar() {
             <MenuIcon className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="right" className="w-300px">
+
+        <SheetContent side="right" className="w-[300px]">
           <SheetHeader>
             <SheetTitle>Menu</SheetTitle>
           </SheetHeader>
+
           <nav className="flex flex-col space-y-4 mt-6">
-            <Button variant="ghost" className="flex items-center gap-3 justify-start" asChild>
-              <Link href="/">
+            {/* Home */}
+            <Button
+              variant="ghost"
+              className="flex items-center gap-3 justify-start"
+              asChild
+            >
+              <Link href="/" onClick={handleClose}>
                 <HomeIcon className="w-4 h-4" />
                 Home
               </Link>
@@ -43,20 +61,43 @@ function MobileNavbar() {
 
             {user ? (
               <>
-                <Button variant="ghost" className="flex items-center gap-3 justify-start" asChild>
-                  <Link href="/notifications">
+                {/* Notifications */}
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-3 justify-start"
+                  asChild
+                >
+                  <Link href="/notifications" onClick={handleClose}>
                     <BellIcon className="w-4 h-4" />
                     Notifications
                   </Link>
                 </Button>
-                <Button variant="ghost" className="flex items-center gap-3 justify-start" asChild>
-                  <Link href="/profile">
+
+                {/* Profile */}
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-3 justify-start"
+                  asChild
+                >
+                  <Link
+                    href={`/profile/${
+                      user.username ??
+                      user.emailAddresses[0].emailAddress.split("@")[0]
+                    }`}
+                    onClick={handleClose}
+                  >
                     <UserIcon className="w-4 h-4" />
                     Profile
                   </Link>
                 </Button>
+
+                {/* Logout */}
                 <SignOutButton>
-                  <Button variant="ghost" className="flex items-center gap-3 justify-start w-full">
+                  <Button
+                    variant="ghost"
+                    className="flex items-center gap-3 justify-start w-full"
+                    onClick={handleClose}
+                  >
                     <LogOutIcon className="w-4 h-4" />
                     Logout
                   </Button>
